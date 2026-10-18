@@ -1,71 +1,61 @@
 <!DOCTYPE html>
 <html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0b6bcb"><title>Suivi Livraisons</title>
+<meta name="theme-color" content="#1d6f42"><title>Suivi Livraisons</title>
 <style>
-:root{--bg:#f4f6f8;--c:#fff;--t:#1d2733;--m:#66727f;--p:#0b6bcb;--b:#d8dee5;--ok:#1a8a4a;--wa:#c27a00;--ko:#c9302c}
-@media(prefers-color-scheme:dark){:root{--bg:#10151b;--c:#1a222b;--t:#e8edf2;--m:#93a0ad;--p:#4da3ff;--b:#2c3743;--ok:#2ea565;--wa:#c98a1f;--ko:#e0524d}}
+:root{--bg:#f4f6f8;--c:#fff;--t:#1d2733;--m:#66727f;--p:#1d6f42;--b:#cfd6dd;--h:#e3efe7;--ok:#d3efdd;--wa:#fbe7bf;--ko:#f9d2d0;--x:#fff0a8}
+@media(prefers-color-scheme:dark){:root{--bg:#10151b;--c:#1a222b;--t:#e8edf2;--m:#93a0ad;--p:#2e8b57;--b:#34414e;--h:#22382c;--ok:#1f4a32;--wa:#58431a;--ko:#592624;--x:#5a5320}}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--t);font:15px/1.4 system-ui,sans-serif;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
-main{max-width:900px;margin:auto;padding:12px}
-.card{background:var(--c);border:1px solid var(--b);border-radius:12px;padding:12px;margin-bottom:12px}
-h1{font-size:18px;margin:0}h2{font-size:15px;margin:0 0 8px}
-input,select,textarea,button{font:inherit;color:inherit;width:100%;padding:10px;margin:4px 0 8px;border:1px solid var(--b);border-radius:8px;background:var(--c)}
-button{background:var(--p);color:#fff;border:0;font-weight:600;cursor:pointer}
-button.g{background:transparent;color:var(--p);border:1px solid var(--p)}
-button.r{background:var(--ko)}
-.row{display:flex;gap:8px}.row>*{flex:1}
-.bar{display:flex;justify-content:space-between;align-items:center;gap:8px}
-.bar button{width:auto;margin:0;padding:8px 12px}
-.tabs{display:flex;gap:6px;margin-bottom:12px}
-.tabs button{margin:0;background:var(--c);color:var(--t);border:1px solid var(--b)}
-.tabs button.on{background:var(--p);color:#fff;border-color:var(--p)}
-.tag{display:inline-block;padding:2px 8px;border-radius:99px;font-size:12px;font-weight:600;color:#fff;white-space:nowrap}
-.ok{background:var(--ok)}.wa{background:var(--wa)}.ko{background:var(--ko)}
-.w{overflow-x:auto}
-table{border-collapse:collapse;width:100%;font-size:13px}
-th,td{padding:6px 8px;border-bottom:1px solid var(--b);text-align:left;white-space:nowrap}
-th{color:var(--m)}tr.tot td{font-weight:700}
-.it{border-top:1px solid var(--b);padding:8px 0}
-.it .row button{padding:6px;margin:6px 0 0}
-.dot{width:10px;height:10px;border-radius:50%;display:inline-block;background:var(--ko)}.dot.on{background:var(--ok)}
-.hide{display:none!important}.m{color:var(--m);font-size:13px}
-#toast{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));background:#222;color:#fff;padding:10px;border-radius:8px;text-align:center;z-index:9}
-</style></head><body><main>
-<section id="login" class="card"><h1>Suivi des livraisons</h1><p class="m">Cobra · Kinkoli</p>
+body{margin:0;background:var(--bg);color:var(--t);font:14px system-ui,sans-serif;padding:env(safe-area-inset-top) 0 calc(54px + env(safe-area-inset-bottom))}
+.card{background:var(--c);border:1px solid var(--b);border-radius:12px;padding:12px;margin:12px}
+input,select,textarea,button{font:inherit;color:inherit}
+.card input,.card select,.card button{width:100%;padding:10px;margin:4px 0 8px;border:1px solid var(--b);border-radius:8px;background:var(--c)}
+button{cursor:pointer}.card button,#top button,#more{background:var(--p);color:#fff;border:0;font-weight:600}
+#top{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 12px;background:var(--p);color:#fff}
+#top button{width:auto;margin:0;padding:6px 12px;border-radius:8px;background:#fff3;border:1px solid #fff8}
+.dot{width:10px;height:10px;border-radius:50%;display:inline-block;background:#e0524d}.dot.on{background:#7dffb0}
+#hd{padding:10px 12px}#hd .m{margin:4px 0}.m{color:var(--m);font-size:13px}
+#hd input{border:1px solid var(--b);border-radius:6px;padding:6px;background:var(--c);width:200px;max-width:60%}
+.gw{overflow:auto;max-height:calc(100dvh - 240px);border-top:1px solid var(--b)}
+table{border-collapse:collapse;table-layout:fixed;min-width:1180px;width:100%;background:var(--c)}
+th,td{border:1px solid var(--b);padding:0;height:34px}
+th{position:sticky;top:0;background:var(--h);z-index:2;padding:6px;font-size:12px;text-align:left}
+td:first-child,th:first-child{position:sticky;left:0;width:40px;background:var(--h);text-align:center;z-index:1;font-size:12px;color:var(--m)}
+th:first-child{z-index:3}
+td input,td select{width:100%;height:34px;border:0;padding:0 6px;background:transparent;outline:0;border-radius:0}
+td input:focus,td select:focus{outline:2px solid var(--p);outline-offset:-2px}
+td.x{background:var(--x)}select.ok{background:var(--ok)}select.wa{background:var(--wa)}select.ko{background:var(--ko)}
+tr.ex td{color:var(--m);font-style:italic;padding:0 6px;background:var(--bg)}
+#an td,#an th,#at td,#at th,#ht td,#ht th{padding:6px 8px;white-space:nowrap;height:auto;position:static}
+#at,#an,#ht{min-width:0}tr.tot td{font-weight:700}
+#more{margin:10px 12px;padding:10px;border-radius:8px;width:calc(100% - 24px)}
+#tabs{position:fixed;left:0;right:0;bottom:0;display:flex;overflow-x:auto;background:var(--c);border-top:1px solid var(--b);padding-bottom:env(safe-area-inset-bottom)}
+#tabs button{flex:none;border:0;border-right:1px solid var(--b);background:transparent;padding:14px 16px;min-width:48px}
+#tabs button.on{background:var(--h);font-weight:700;box-shadow:inset 0 -3px var(--p)}
+.row{display:flex;gap:8px}.row>*{flex:1}.w{overflow-x:auto}
+.hide{display:none!important}
+#toast{position:fixed;left:12px;right:12px;bottom:70px;background:#222;color:#fff;padding:10px;border-radius:8px;text-align:center;z-index:9}
+</style></head><body>
+<section id="login" class="card"><h2>Suivi des livraisons</h2><p class="m">Cobra · Kinkoli</p>
 <select id="lm"></select><input id="lc" type="password" inputmode="numeric" placeholder="Code d’accès"><button id="lg">Entrer</button><p id="le" class="m"></p></section>
 
 <section id="app" class="hide">
-<div class="bar card"><div><h1 id="who"></h1><span class="m"><i class="dot" id="dot"></i> <span id="cn">hors ligne</span></span></div><button class="g" id="out">Quitter</button></div>
-<div class="tabs" id="tabs"></div>
+<div id="top"><div><b>Suivi des livraisons</b> · <span id="who"></span><br><i class="dot" id="dot"></i> <small id="cn">hors ligne</small></div><button id="out">Quitter</button></div>
 
-<div id="v-saisie" class="hide">
-<div class="card"><label class="m">Date du rapport</label><input type="date" id="day">
-<h2 id="ft">Nouvelle livraison</h2>
-<input id="c" placeholder="Client / Magasin">
-<select id="s"></select>
-<div id="g1"><input id="b" placeholder="N° Bon"><input id="t" placeholder="N° Camion"><div class="row"><input type="date" id="ds"><input type="time" id="h"></div></div>
-<textarea id="mo" rows="2" placeholder="Motif (si non livré ou partielle)"></textarea>
-<div class="row"><button id="sv">Enregistrer</button><button class="g" id="cx">Annuler</button></div></div>
-<div class="card"><h2 id="sum"></h2><div id="list"></div></div>
-</div>
+<div id="v-sheet" class="hide"><div id="hd"></div><div class="gw"><table id="g"></table></div><button id="more">+ 50 lignes</button></div>
 
-<div id="v-analyse" class="hide">
-<div class="card"><label class="m">Date analysée</label><input type="date" id="ad"><div class="w"><table id="at"></table></div></div>
-<div class="card"><h2>Non livrés du jour</h2><div class="w"><table id="an"></table></div></div>
-</div>
+<div id="v-an" class="hide"><div class="card"><label class="m">Date analysée</label><input type="date" id="ad"><div class="w"><table id="at"></table></div></div>
+<div class="card"><b>Non livrés du jour</b><div class="w"><table id="an"></table></div></div></div>
 
-<div id="v-histo" class="hide"><div class="card">
-<div class="row"><input type="date" id="hd"><select id="hm"></select></div>
+<div id="v-hi" class="hide"><div class="card"><div class="row"><input type="date" id="hd2"><select id="hm"></select></div>
 <div class="row"><select id="hs"></select><input id="hq" placeholder="Rechercher…"></div>
 <p class="m" id="hc"></p><div class="w"><table id="ht"></table></div></div></div>
 
-<div id="v-mag" class="hide"><div class="card"><h2>Noms des magasins</h2><div id="mn"></div></div></div>
-</section></main><div id="toast" class="hide"></div>
+<nav id="tabs"></nav></section><div id="toast" class="hide"></div>
 
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/13.0.0/firebase-app.js";
-import{getDatabase,ref,onValue,push,update,set,remove}from"https://www.gstatic.com/firebasejs/13.0.0/firebase-database.js";
+import{getDatabase,ref,onValue,set,remove}from"https://www.gstatic.com/firebasejs/13.0.0/firebase-database.js";
 const db=getDatabase(initializeApp({
  apiKey:"AIzaSyDEewCZo1FJxzbOPjdIWChjkJLV3xfbLKU",
  authDomain:"suivi-livraison-4b30a.firebaseapp.com",
@@ -77,20 +67,22 @@ const db=getDatabase(initializeApp({
 
 const CODES={1:"6894",2:"2010",3:"2338",4:"5294",5:"1502",6:"5489",7:"8427",8:"4640",9:"9560",A:"151033"};
 const ST=["Livré","Livraison partielle","Non livré"],SC={"Livré":"ok","Livraison partielle":"wa","Non livré":"ko"};
+const K=["a","b","c","d","e","f","g","h"],TY=["date","text","select","text","text","date","time","text"];
+const HD=["Date du rapport","Client / Magasin","Statut","N° Bon","N° Camion","Date de sortie","Heure de sortie","Motif (si non livré ou partielle)"];
 const M=[1,2,3,4,5,6,7,8,9];
 const $=s=>document.querySelector(s);
 const iso=()=>new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const site=m=>m<=6?"Cobra":"Kinkoli";
 const fr=d=>d?d.split("-").reverse().join("/"):"";
-let rows={},names={},user=null,edit=null,view="";
+let data={},names={},user=null,view="",shown=60;
 const nm=m=>names[m]||"Magasin "+m;
-const all=()=>Object.entries(rows).map(([id,r])=>({id,...r}));
+const cv=(m,r,k)=>data[m]?.[r]?.[k]??"";
 const toast=t=>{const e=$("#toast");e.textContent=t;e.classList.remove("hide");setTimeout(()=>e.classList.add("hide"),2500)};
-const opts=(a,f)=>a.map(x=>`<option value="${x[0]}">${esc(x[1])}</option>`).join("");
+const opts=a=>a.map(x=>`<option value="${x[0]}">${esc(x[1])}</option>`).join("");
+const last=m=>{let n=0;Object.entries(data[m]||{}).forEach(([r,x])=>{if(x&&Object.keys(x).length)n=Math.max(n,+r+1)});return n};
 
-/* Données en direct */
-onValue(ref(db,"livraisons"),s=>{rows=s.val()||{};render()});
+onValue(ref(db,"feuilles"),s=>{data=s.val()||{};render()});
 onValue(ref(db,"noms"),s=>{names=s.val()||{};render()});
 onValue(ref(db,".info/connected"),s=>{const o=!!s.val();$("#dot").classList.toggle("on",o);$("#cn").textContent=o?"synchronisé en direct":"hors ligne"});
 
@@ -100,61 +92,53 @@ $("#lg").onclick=()=>{const k=$("#lm").value,c=$("#lc").value.trim();if(CODES[k]
  try{localStorage.setItem("sl",JSON.stringify({k,c}))}catch{}enter(k)};
 $("#out").onclick=()=>{try{localStorage.removeItem("sl")}catch{}user=null;$("#app").classList.add("hide");$("#login").classList.remove("hide");$("#lc").value=""};
 function enter(k){user=k;$("#login").classList.add("hide");$("#app").classList.remove("hide");
- const T=k==="A"?[["analyse","Analyse"],["histo","Historique"],["mag","Magasins"]]:[["saisie","Saisie"]];
- $("#tabs").innerHTML=T.map(t=>`<button data-v="${t[0]}">${t[1]}</button>`).join("");
- if(k==="A")$("#mn").innerHTML=M.map(i=>`<label class="m">${i} · ${site(i)}</label><input data-n="${i}" placeholder="Magasin ${i}">`).join("");
- show(T[0][0])}
+ show(k==="A"?"1":k)}
+function tabs(){const T=user==="A"?[...M.map(i=>[String(i),names[i]||String(i)]),["H","Historique"],["A","Analyse"]]:[[user,names[user]||user]];
+ $("#tabs").innerHTML=T.map(t=>`<button data-v="${t[0]}" class="${t[0]===view?"on":""}">${esc(t[1])}</button>`).join("")}
 $("#tabs").onclick=e=>{if(e.target.dataset.v)show(e.target.dataset.v)};
-function show(v){view=v;["saisie","analyse","histo","mag"].forEach(x=>$("#v-"+x).classList.toggle("hide",x!==v));
- document.querySelectorAll("#tabs button").forEach(b=>b.classList.toggle("on",b.dataset.v===v));render()}
+function show(v){view=v;const sh=/^[1-9]$/.test(v);
+ $("#v-sheet").classList.toggle("hide",!sh);$("#v-an").classList.toggle("hide",v!=="A");$("#v-hi").classList.toggle("hide",v!=="H");
+ $("#who").textContent=user==="A"?"Administrateur":nm(user)+" · "+site(+user);
+ if(sh)buildSheet();render()}
 
-/* Saisie */
-$("#s").innerHTML=opts(ST.map(x=>[x,x]));$("#day").value=iso();$("#ad").value=iso();
+/* Feuille type Excel */
+function buildSheet(n){const m=+view;shown=n||Math.min(500,Math.max(60,last(m)+20));
+ $("#hd").innerHTML=`<b>Rapport de livraison — Site : ${site(m)}</b><div class="m">Une ligne par client/magasin. Livré ou Livraison partielle : remplir N° bon, N° camion, date et heure de sortie. Non livré ou partielle : remplir le motif.</div>Responsable : <input id="rp" placeholder="Nom du magasin">`;
+ let h=`<thead><tr><th>#</th>${HD.map(x=>`<th>${x}</th>`).join("")}</tr></thead><tbody><tr class="ex"><td>ex.</td><td>18/10/2026</td><td>Client exemple</td><td>Livré</td><td>BL-1234</td><td>8541 TU 123</td><td>18/10/2026</td><td>08:30</td><td></td></tr>`;
+ for(let r=0;r<shown;r++)h+=`<tr><td>${r+1}</td>${K.map((k,i)=>`<td>${TY[i]==="select"?`<select data-r="${r}" data-k="${k}"><option></option>${ST.map(s=>`<option>${s}</option>`).join("")}</select>`:`<input type="${TY[i]}" data-r="${r}" data-k="${k}">`}</td>`).join("")}</tr>`;
+ $("#g").innerHTML=h+"</tbody>";$("#more").classList.toggle("hide",shown>=500);paint()}
+$("#more").onclick=()=>buildSheet(Math.min(500,shown+50));
+function paint(){const m=+view,a=document.activeElement;if(last(m)>shown)return buildSheet();
+ const rp=$("#rp");if(rp&&a!==rp)rp.value=names[m]||"";
+ document.querySelectorAll("#g [data-r]").forEach(el=>{const{r,k}=el.dataset,v=cv(m,r,k),s=cv(m,r,"c");
+  if(el!==a&&el.value!==v)el.value=v;if(k==="c")el.className=SC[v]||"";
+  const need=s&&((s!==ST[2]&&"defg".includes(k))||(s!==ST[0]&&k==="h"));
+  el.parentNode.classList.toggle("x",!!need&&!v)})}
+$("#g").onchange=e=>{const{r,k}=e.target.dataset;if(r==null)return;const m=+view,v=e.target.value.trim();
+ set(ref(db,`feuilles/${m}/${r}/${k}`),v||null).catch(x=>toast(x.message));
+ if(k==="b"&&v&&!cv(m,r,"a"))set(ref(db,`feuilles/${m}/${r}/a`),iso())};
+$("#hd").onchange=e=>{if(e.target.id!=="rp")return;const m=+view,v=e.target.value.trim();(v?set(ref(db,"noms/"+m),v):remove(ref(db,"noms/"+m))).catch(x=>toast(x.message))};
+
+/* Analyse + Historique */
+function flat(){const o=[];M.forEach(m=>Object.entries(data[m]||{}).forEach(([r,x])=>{if(x&&x.b)o.push({m,r:+r,...x})}));return o}
+function cnt(l){const o={t:l.length,l:0,p:0,n:0};l.forEach(r=>r.c===ST[0]?o.l++:r.c===ST[1]?o.p++:r.c===ST[2]&&o.n++);o.pc=(o.t?Math.round(o.l/o.t*100):0)+" %";return o}
+const tr=(a,c)=>`<tr${c?` class="${c}"`:""}>${a.map(x=>`<td>${esc(x)}</td>`).join("")}</tr>`;
+$("#ad").value=iso();
 $("#hm").innerHTML='<option value="">Tous les magasins</option>'+opts(M.map(i=>[i,"Magasin "+i]));
 $("#hs").innerHTML='<option value="">Tous les statuts</option>'+opts(ST.map(x=>[x,x]));
-function syncG(){const s=$("#s").value;$("#g1").classList.toggle("hide",s===ST[2]);$("#mo").classList.toggle("hide",s===ST[0]);
- if(s!==ST[2]){if(!$("#ds").value)$("#ds").value=$("#day").value;if(!$("#h").value)$("#h").value=new Date().toTimeString().slice(0,5)}}
-function resetForm(){edit=null;$("#ft").textContent="Nouvelle livraison";["c","b","t","ds","h","mo"].forEach(i=>$("#"+i).value="");$("#s").value=ST[0];syncG()}
-$("#s").onchange=syncG;$("#cx").onclick=resetForm;
-$("#day").onchange=()=>{$("#ds").value="";syncG();render()};
-$("#sv").onclick=async()=>{
- const r={m:+user,d:$("#day").value,c:$("#c").value.trim(),s:$("#s").value,b:$("#b").value.trim(),t:$("#t").value.trim(),ds:$("#ds").value,h:$("#h").value,mo:$("#mo").value.trim()};
- if(!r.c)return toast("Indiquez le client / magasin.");
- if(r.s!==ST[2]&&!(r.b&&r.t&&r.ds&&r.h))return toast("Remplir N° bon, N° camion, date et heure de sortie.");
- if(r.s!==ST[0]&&!r.mo)return toast("Le motif est obligatoire.");
- if(r.s===ST[2])r.b=r.t=r.ds=r.h="";if(r.s===ST[0])r.mo="";
- try{if(edit)await update(ref(db,"livraisons/"+edit),r);else{r.ts=Date.now();await push(ref(db,"livraisons"),r)}resetForm();toast("Enregistré")}catch(e){toast("Erreur : "+e.message)}};
-$("#list").onclick=e=>{const d=e.target.dataset;
- if(d.d)return del(d.d);
- if(d.e){const r=rows[d.e];edit=d.e;$("#ft").textContent="Modifier";$("#c").value=r.c;$("#s").value=r.s;$("#b").value=r.b||"";$("#t").value=r.t||"";$("#ds").value=r.ds||"";$("#h").value=r.h||"";$("#mo").value=r.mo||"";syncG();scrollTo(0,0)}};
-function del(id){if(confirm("Supprimer cette ligne ?"))remove(ref(db,"livraisons/"+id)).catch(e=>toast(e.message))}
-
-/* Calculs */
-function cnt(l){const o={t:l.length,l:0,p:0,n:0};l.forEach(r=>r.s===ST[0]?o.l++:r.s===ST[1]?o.p++:o.n++);o.pc=(o.t?Math.round(o.l/o.t*100):0)+" %";return o}
-const tr=(a,c)=>`<tr${c?` class="${c}"`:""}>${a.map(x=>`<td>${esc(x)}</td>`).join("")}</tr>`;
-
-/* Affichage */
-function render(){fillLogin();if(!user)return;
- $("#who").textContent=user==="A"?"Administrateur":nm(user)+" · "+site(+user);
- if(view==="saisie"){const l=all().filter(r=>r.m==user&&r.d===$("#day").value).sort((a,b)=>b.ts-a.ts),o=cnt(l);
-  $("#sum").textContent=`${o.t} client(s) · ${o.l} livrés · ${o.p} partielles · ${o.n} non livrés`;
-  $("#list").innerHTML=l.map(r=>`<div class="it"><div class="bar"><b>${esc(r.c)}</b><span class="tag ${SC[r.s]}">${r.s}</span></div>
-  <div class="m">${[r.b&&"Bon "+r.b,r.t&&"Camion "+r.t,r.ds&&fr(r.ds)+" "+(r.h||""),r.mo].filter(Boolean).map(esc).join(" · ")}</div>
-  <div class="row"><button class="g" data-e="${r.id}">Modifier</button><button class="r" data-d="${r.id}">Supprimer</button></div></div>`).join("")||'<p class="m">Aucune ligne pour cette date.</p>'}
- if(view==="analyse"){const l=all().filter(r=>r.d===$("#ad").value),by=f=>cnt(l.filter(f)),R=(a,o,c)=>tr([...a,o.t,o.l,o.p,o.n,o.pc],c);
+function render(){fillLogin();if(!user)return;tabs();
+ if(/^[1-9]$/.test(view))paint();
+ if(view==="A"){const l=flat().filter(r=>r.a===$("#ad").value),by=f=>cnt(l.filter(f)),R=(a,o,c)=>tr([...a,o.t,o.l,o.p,o.n,o.pc],c);
   $("#at").innerHTML="<tr><th>Site</th><th>Magasin</th><th>Total</th><th>Livrés</th><th>Partielles</th><th>Non livrés</th><th>% livrés</th></tr>"+
    M.map(i=>R([site(i),nm(i)],by(r=>r.m==i))).join("")+R(["Total Cobra",""],by(r=>r.m<=6),"tot")+R(["Total Kinkoli",""],by(r=>r.m>6),"tot")+R(["TOTAL GÉNÉRAL",""],by(()=>true),"tot");
-  $("#an").innerHTML="<tr><th>Magasin</th><th>Client / Magasin</th><th>Motif</th></tr>"+l.filter(r=>r.s===ST[2]).sort((a,b)=>a.m-b.m).map(r=>tr([nm(r.m),r.c,r.mo])).join("")}
- if(view==="histo"){const q=$("#hq").value.toLowerCase(),d=$("#hd").value,m=$("#hm").value,s=$("#hs").value;
-  const l=all().filter(r=>(!d||r.d===d)&&(!m||r.m==m)&&(!s||r.s===s)&&(!q||JSON.stringify(r).toLowerCase().includes(q))).sort((a,b)=>b.d.localeCompare(a.d)||b.ts-a.ts);
+  $("#an").innerHTML="<tr><th>Magasin</th><th>Client / Magasin</th><th>Motif</th></tr>"+l.filter(r=>r.c===ST[2]).sort((a,b)=>a.m-b.m).map(r=>tr([nm(r.m),r.b,r.h])).join("")}
+ if(view==="H"){const q=$("#hq").value.toLowerCase(),d=$("#hd2").value,m=$("#hm").value,s=$("#hs").value;
+  const l=flat().filter(r=>(!d||r.a===d)&&(!m||r.m==m)&&(!s||r.c===s)&&(!q||JSON.stringify(r).toLowerCase().includes(q))).sort((x,y)=>(y.a||"").localeCompare(x.a||"")||x.m-y.m||x.r-y.r);
   $("#hc").textContent=l.length+" ligne(s)"+(l.length>500?" — 500 premières affichées":"");
-  $("#ht").innerHTML="<tr><th>Magasin</th><th>Site</th><th>Date</th><th>Client</th><th>Statut</th><th>Bon</th><th>Camion</th><th>Sortie</th><th>Motif</th><th></th></tr>"+
-   l.slice(0,500).map(r=>`<tr><td>${esc(nm(r.m))}</td><td>${site(r.m)}</td><td>${fr(r.d)}</td><td>${esc(r.c)}</td><td><span class="tag ${SC[r.s]}">${r.s}</span></td><td>${esc(r.b)}</td><td>${esc(r.t)}</td><td>${fr(r.ds)} ${esc(r.h)}</td><td>${esc(r.mo)}</td><td><button class="r" style="width:auto;margin:0;padding:4px 10px" data-d="${r.id}">×</button></td></tr>`).join("")}
- if(view==="mag")document.querySelectorAll("#mn input").forEach(i=>{if(document.activeElement!==i)i.value=names[i.dataset.n]||""})}
-["ad","hd","hm","hs"].forEach(i=>$("#"+i).onchange=render);$("#hq").oninput=render;
-$("#ht").onclick=e=>{if(e.target.dataset.d)del(e.target.dataset.d)};
-$("#mn").onchange=e=>{const i=e.target.dataset.n,v=e.target.value.trim();(v?set(ref(db,"noms/"+i),v):remove(ref(db,"noms/"+i))).catch(x=>toast(x.message))};
+  $("#ht").innerHTML="<tr><th>Magasin</th><th>Site</th><th>Date</th><th>Client</th><th>Statut</th><th>Bon</th><th>Camion</th><th>Sortie</th><th>Motif</th></tr>"+
+   l.slice(0,500).map(r=>tr([nm(r.m),site(r.m),fr(r.a),r.b,r.c,r.d,r.e,(fr(r.f)+" "+(r.g||"")).trim(),r.h])).join("")}}
+["ad","hd2","hm","hs"].forEach(i=>$("#"+i).onchange=render);$("#hq").oninput=render;
 
-syncG();fillLogin();
+fillLogin();
 try{const s=JSON.parse(localStorage.getItem("sl")||"null");if(s&&CODES[s.k]===s.c)enter(s.k)}catch{}
 </script></body></html>
