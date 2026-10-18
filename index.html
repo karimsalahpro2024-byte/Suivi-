@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b6bcb"><title>Suivi Livraisons</title>
+<style>
+:root{--bg:#f4f6f8;--c:#fff;--t:#1d2733;--m:#66727f;--p:#0b6bcb;--b:#d8dee5;--ok:#1a8a4a;--wa:#c27a00;--ko:#c9302c}
+@media(prefers-color-scheme:dark){:root{--bg:#10151b;--c:#1a222b;--t:#e8edf2;--m:#93a0ad;--p:#4da3ff;--b:#2c3743;--ok:#2ea565;--wa:#c98a1f;--ko:#e0524d}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--t);font:15px/1.4 system-ui,sans-serif;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+main{max-width:900px;margin:auto;padding:12px}
+.card{background:var(--c);border:1px solid var(--b);border-radius:12px;padding:12px;margin-bottom:12px}
+h1{font-size:18px;margin:0}h2{font-size:15px;margin:0 0 8px}
+input,select,textarea,button{font:inherit;color:inherit;width:100%;padding:10px;margin:4px 0 8px;border:1px solid var(--b);border-radius:8px;background:var(--c)}
+button{background:var(--p);color:#fff;border:0;font-weight:600;cursor:pointer}
+button.g{background:transparent;color:var(--p);border:1px solid var(--p)}
+button.r{background:var(--ko)}
+.row{display:flex;gap:8px}.row>*{flex:1}
+.bar{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.bar button{width:auto;margin:0;padding:8px 12px}
+.tabs{display:flex;gap:6px;margin-bottom:12px}
+.tabs button{margin:0;background:var(--c);color:var(--t);border:1px solid var(--b)}
+.tabs button.on{background:var(--p);color:#fff;border-color:var(--p)}
+.tag{display:inline-block;padding:2px 8px;border-radius:99px;font-size:12px;font-weight:600;color:#fff;white-space:nowrap}
+.ok{background:var(--ok)}.wa{background:var(--wa)}.ko{background:var(--ko)}
+.w{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{padding:6px 8px;border-bottom:1px solid var(--b);text-align:left;white-space:nowrap}
+th{color:var(--m)}tr.tot td{font-weight:700}
+.it{border-top:1px solid var(--b);padding:8px 0}
+.it .row button{padding:6px;margin:6px 0 0}
+.dot{width:10px;height:10px;border-radius:50%;display:inline-block;background:var(--ko)}.dot.on{background:var(--ok)}
+.hide{display:none!important}.m{color:var(--m);font-size:13px}
+#toast{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));background:#222;color:#fff;padding:10px;border-radius:8px;text-align:center;z-index:9}
+</style></head><body><main>
+<section id="login" class="card"><h1>Suivi des livraisons</h1><p class="m">Cobra · Kinkoli</p>
+<select id="lm"></select><input id="lc" type="password" inputmode="numeric" placeholder="Code d’accès"><button id="lg">Entrer</button><p id="le" class="m"></p></section>
+
+<section id="app" class="hide">
+<div class="bar card"><div><h1 id="who"></h1><span class="m"><i class="dot" id="dot"></i> <span id="cn">hors ligne</span></span></div><button class="g" id="out">Quitter</button></div>
+<div class="tabs" id="tabs"></div>
+
+<div id="v-saisie" class="hide">
+<div class="card"><label class="m">Date du rapport</label><input type="date" id="day">
+<h2 id="ft">Nouvelle livraison</h2>
+<input id="c" placeholder="Client / Magasin">
+<select id="s"></select>
+<div id="g1"><input id="b" placeholder="N° Bon"><input id="t" placeholder="N° Camion"><div class="row"><input type="date" id="ds"><input type="time" id="h"></div></div>
+<textarea id="mo" rows="2" placeholder="Motif (si non livré ou partielle)"></textarea>
+<div class="row"><button id="sv">Enregistrer</button><button class="g" id="cx">Annuler</button></div></div>
+<div class="card"><h2 id="sum"></h2><div id="list"></div></div>
+</div>
+
+<div id="v-analyse" class="hide">
+<div class="card"><label class="m">Date analysée</label><input type="date" id="ad"><div class="w"><table id="at"></table></div></div>
+<div class="card"><h2>Non livrés du jour</h2><div class="w"><table id="an"></table></div></div>
+</div>
+
+<div id="v-histo" class="hide"><div class="card">
+<div class="row"><input type="date" id="hd"><select id="hm"></select></div>
+<div class="row"><select id="hs"></select><input id="hq" placeholder="Rechercher…"></div>
+<p class="m" id="hc"></p><div class="w"><table id="ht"></table></div></div></div>
+
+<div id="v-mag" class="hide"><div class="card"><h2>Noms des magasins</h2><div id="mn"></div></div></div>
+</section></main><div id="toast" class="hide"></div>
+
+<script type="module">
+import{initializeApp}from"https://www.gstatic.com/firebasejs/13.0.0/firebase-app.js";
+import{getDatabase,ref,onValue,push,update,set,remove}from"https://www.gstatic.com/firebasejs/13.0.0/firebase-database.js";
+const db=getDatabase(initializeApp({
+ apiKey:"AIzaSyDEewCZo1FJxzbOPjdIWChjkJLV3xfbLKU",
+ authDomain:"suivi-livraison-4b30a.firebaseapp.com",
+ databaseURL:"https://suivi-livraison-4b30a-default-rtdb.europe-west1.firebasedatabase.app",
+ projectId:"suivi-livraison-4b30a",
+ storageBucket:"suivi-livraison-4b30a.firebasestorage.app",
+ messagingSenderId:"704187089933",
+ appId:"1:704187089933:web:8c3cffeb15223c60610144"}));
+
+const CODES={1:"6894",2:"2010",3:"2338",4:"5294",5:"1502",6:"5489",7:"8427",8:"4640",9:"9560",A:"151033"};
+const ST=["Livré","Livraison partielle","Non livré"],SC={"Livré":"ok","Livraison partielle":"wa","Non livré":"ko"};
+const M=[1,2,3,4,5,6,7,8,9];
+const $=s=>document.querySelector(s);
+const iso=()=>new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const site=m=>m<=6?"Cobra":"Kinkoli";
+const fr=d=>d?d.split("-").reverse().join("/"):"";
+let rows={},names={},user=null,edit=null,view="";
+const nm=m=>names[m]||"Magasin "+m;
+const all=()=>Object.entries(rows).map(([id,r])=>({id,...r}));
+const toast=t=>{const e=$("#toast");e.textContent=t;e.classList.remove("hide");setTimeout(()=>e.classList.add("hide"),2500)};
+const opts=(a,f)=>a.map(x=>`<option value="${x[0]}">${esc(x[1])}</option>`).join("");
+
+/* Données en direct */
+onValue(ref(db,"livraisons"),s=>{rows=s.val()||{};render()});
+onValue(ref(db,"noms"),s=>{names=s.val()||{};render()});
+onValue(ref(db,".info/connected"),s=>{const o=!!s.val();$("#dot").classList.toggle("on",o);$("#cn").textContent=o?"synchronisé en direct":"hors ligne"});
+
+/* Connexion */
+function fillLogin(){const v=$("#lm").value;$("#lm").innerHTML=opts(M.map(i=>[i,nm(i)+" ("+site(i)+")"]))+'<option value="A">Administrateur</option>';if(v)$("#lm").value=v}
+$("#lg").onclick=()=>{const k=$("#lm").value,c=$("#lc").value.trim();if(CODES[k]!==c){$("#le").textContent="Code incorrect.";return}
+ try{localStorage.setItem("sl",JSON.stringify({k,c}))}catch{}enter(k)};
+$("#out").onclick=()=>{try{localStorage.removeItem("sl")}catch{}user=null;$("#app").classList.add("hide");$("#login").classList.remove("hide");$("#lc").value=""};
+function enter(k){user=k;$("#login").classList.add("hide");$("#app").classList.remove("hide");
+ const T=k==="A"?[["analyse","Analyse"],["histo","Historique"],["mag","Magasins"]]:[["saisie","Saisie"]];
+ $("#tabs").innerHTML=T.map(t=>`<button data-v="${t[0]}">${t[1]}</button>`).join("");
+ if(k==="A")$("#mn").innerHTML=M.map(i=>`<label class="m">${i} · ${site(i)}</label><input data-n="${i}" placeholder="Magasin ${i}">`).join("");
+ show(T[0][0])}
+$("#tabs").onclick=e=>{if(e.target.dataset.v)show(e.target.dataset.v)};
+function show(v){view=v;["saisie","analyse","histo","mag"].forEach(x=>$("#v-"+x).classList.toggle("hide",x!==v));
+ document.querySelectorAll("#tabs button").forEach(b=>b.classList.toggle("on",b.dataset.v===v));render()}
+
+/* Saisie */
+$("#s").innerHTML=opts(ST.map(x=>[x,x]));$("#day").value=iso();$("#ad").value=iso();
+$("#hm").innerHTML='<option value="">Tous les magasins</option>'+opts(M.map(i=>[i,"Magasin "+i]));
+$("#hs").innerHTML='<option value="">Tous les statuts</option>'+opts(ST.map(x=>[x,x]));
+function syncG(){const s=$("#s").value;$("#g1").classList.toggle("hide",s===ST[2]);$("#mo").classList.toggle("hide",s===ST[0]);
+ if(s!==ST[2]){if(!$("#ds").value)$("#ds").value=$("#day").value;if(!$("#h").value)$("#h").value=new Date().toTimeString().slice(0,5)}}
+function resetForm(){edit=null;$("#ft").textContent="Nouvelle livraison";["c","b","t","ds","h","mo"].forEach(i=>$("#"+i).value="");$("#s").value=ST[0];syncG()}
+$("#s").onchange=syncG;$("#cx").onclick=resetForm;
+$("#day").onchange=()=>{$("#ds").value="";syncG();render()};
+$("#sv").onclick=async()=>{
+ const r={m:+user,d:$("#day").value,c:$("#c").value.trim(),s:$("#s").value,b:$("#b").value.trim(),t:$("#t").value.trim(),ds:$("#ds").value,h:$("#h").value,mo:$("#mo").value.trim()};
+ if(!r.c)return toast("Indiquez le client / magasin.");
+ if(r.s!==ST[2]&&!(r.b&&r.t&&r.ds&&r.h))return toast("Remplir N° bon, N° camion, date et heure de sortie.");
+ if(r.s!==ST[0]&&!r.mo)return toast("Le motif est obligatoire.");
+ if(r.s===ST[2])r.b=r.t=r.ds=r.h="";if(r.s===ST[0])r.mo="";
+ try{if(edit)await update(ref(db,"livraisons/"+edit),r);else{r.ts=Date.now();await push(ref(db,"livraisons"),r)}resetForm();toast("Enregistré")}catch(e){toast("Erreur : "+e.message)}};
+$("#list").onclick=e=>{const d=e.target.dataset;
+ if(d.d)return del(d.d);
+ if(d.e){const r=rows[d.e];edit=d.e;$("#ft").textContent="Modifier";$("#c").value=r.c;$("#s").value=r.s;$("#b").value=r.b||"";$("#t").value=r.t||"";$("#ds").value=r.ds||"";$("#h").value=r.h||"";$("#mo").value=r.mo||"";syncG();scrollTo(0,0)}};
+function del(id){if(confirm("Supprimer cette ligne ?"))remove(ref(db,"livraisons/"+id)).catch(e=>toast(e.message))}
+
+/* Calculs */
+function cnt(l){const o={t:l.length,l:0,p:0,n:0};l.forEach(r=>r.s===ST[0]?o.l++:r.s===ST[1]?o.p++:o.n++);o.pc=(o.t?Math.round(o.l/o.t*100):0)+" %";return o}
+const tr=(a,c)=>`<tr${c?` class="${c}"`:""}>${a.map(x=>`<td>${esc(x)}</td>`).join("")}</tr>`;
+
+/* Affichage */
+function render(){fillLogin();if(!user)return;
+ $("#who").textContent=user==="A"?"Administrateur":nm(user)+" · "+site(+user);
+ if(view==="saisie"){const l=all().filter(r=>r.m==user&&r.d===$("#day").value).sort((a,b)=>b.ts-a.ts),o=cnt(l);
+  $("#sum").textContent=`${o.t} client(s) · ${o.l} livrés · ${o.p} partielles · ${o.n} non livrés`;
+  $("#list").innerHTML=l.map(r=>`<div class="it"><div class="bar"><b>${esc(r.c)}</b><span class="tag ${SC[r.s]}">${r.s}</span></div>
+  <div class="m">${[r.b&&"Bon "+r.b,r.t&&"Camion "+r.t,r.ds&&fr(r.ds)+" "+(r.h||""),r.mo].filter(Boolean).map(esc).join(" · ")}</div>
+  <div class="row"><button class="g" data-e="${r.id}">Modifier</button><button class="r" data-d="${r.id}">Supprimer</button></div></div>`).join("")||'<p class="m">Aucune ligne pour cette date.</p>'}
+ if(view==="analyse"){const l=all().filter(r=>r.d===$("#ad").value),by=f=>cnt(l.filter(f)),R=(a,o,c)=>tr([...a,o.t,o.l,o.p,o.n,o.pc],c);
+  $("#at").innerHTML="<tr><th>Site</th><th>Magasin</th><th>Total</th><th>Livrés</th><th>Partielles</th><th>Non livrés</th><th>% livrés</th></tr>"+
+   M.map(i=>R([site(i),nm(i)],by(r=>r.m==i))).join("")+R(["Total Cobra",""],by(r=>r.m<=6),"tot")+R(["Total Kinkoli",""],by(r=>r.m>6),"tot")+R(["TOTAL GÉNÉRAL",""],by(()=>true),"tot");
+  $("#an").innerHTML="<tr><th>Magasin</th><th>Client / Magasin</th><th>Motif</th></tr>"+l.filter(r=>r.s===ST[2]).sort((a,b)=>a.m-b.m).map(r=>tr([nm(r.m),r.c,r.mo])).join("")}
+ if(view==="histo"){const q=$("#hq").value.toLowerCase(),d=$("#hd").value,m=$("#hm").value,s=$("#hs").value;
+  const l=all().filter(r=>(!d||r.d===d)&&(!m||r.m==m)&&(!s||r.s===s)&&(!q||JSON.stringify(r).toLowerCase().includes(q))).sort((a,b)=>b.d.localeCompare(a.d)||b.ts-a.ts);
+  $("#hc").textContent=l.length+" ligne(s)"+(l.length>500?" — 500 premières affichées":"");
+  $("#ht").innerHTML="<tr><th>Magasin</th><th>Site</th><th>Date</th><th>Client</th><th>Statut</th><th>Bon</th><th>Camion</th><th>Sortie</th><th>Motif</th><th></th></tr>"+
+   l.slice(0,500).map(r=>`<tr><td>${esc(nm(r.m))}</td><td>${site(r.m)}</td><td>${fr(r.d)}</td><td>${esc(r.c)}</td><td><span class="tag ${SC[r.s]}">${r.s}</span></td><td>${esc(r.b)}</td><td>${esc(r.t)}</td><td>${fr(r.ds)} ${esc(r.h)}</td><td>${esc(r.mo)}</td><td><button class="r" style="width:auto;margin:0;padding:4px 10px" data-d="${r.id}">×</button></td></tr>`).join("")}
+ if(view==="mag")document.querySelectorAll("#mn input").forEach(i=>{if(document.activeElement!==i)i.value=names[i.dataset.n]||""})}
+["ad","hd","hm","hs"].forEach(i=>$("#"+i).onchange=render);$("#hq").oninput=render;
+$("#ht").onclick=e=>{if(e.target.dataset.d)del(e.target.dataset.d)};
+$("#mn").onchange=e=>{const i=e.target.dataset.n,v=e.target.value.trim();(v?set(ref(db,"noms/"+i),v):remove(ref(db,"noms/"+i))).catch(x=>toast(x.message))};
+
+syncG();fillLogin();
+try{const s=JSON.parse(localStorage.getItem("sl")||"null");if(s&&CODES[s.k]===s.c)enter(s.k)}catch{}
+</script></body></html>
